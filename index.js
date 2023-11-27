@@ -2,8 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv"
 dotenv.config();
-import book from "./model/booking.js";
-import Bus from "./model/bus.js";
+import checkHealth from "./controllers/health.js"
+import { postBooking ,gelAllBookings ,putbookings,patchBooking,deleteBookings} from "./controllers/bookings.js";
+import {postv1Bus,postv2bus} from "./controllers/buses.js"
 const app = express();
 app.use(express.json())
 
@@ -15,147 +16,21 @@ const connectdb = async () => {
 }
 connectdb();
 
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'All Good!' })
-})
+app.get('/api/health',checkHealth)
 
-app.post('/api/bookings', async (req, res) => {
-    const { name, age, to, from, adult } = req.body;
+app.post('/api/bookings', postBooking)
 
-    const booking = new book({
-        name, age, to, from, adult
-    })
+app.get('/api/bookings', gelAllBookings )
 
-    try {
-        const savedCustmer = await booking.save();
+app.put('/api/bookings/:id', putbookings)
 
-        return res.status(201).json({
-            success: true,
-            data: savedCustmer,
-            message: "Booking succesfully..!"
-        })
-    } catch (e) {
-        return res.json({
-            success: false,
-            message: e.message
-        })
-    }
-})
+app.patch('/api/bookings/:id', patchBooking)
 
-app.get('/api/bookings', async (req, res) => {
-    const allBook = await book.find();
+app.delete('/api/bookings/:id', deleteBookings)
 
-    res.status(200).json({
-        success: true,
-        data: allBook,
-        message: "fetch all booking"
-    })
-})
+app.post('/api/v1/buses', postv1Bus )
 
-app.put('/api/bookings/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, age, to, from, adult } = req.body;
-
-    await book.updateOne({ _id: id }, {
-        $set: {
-            name: name,
-            age: age,
-            adult: adult,
-            to: to,
-            from: from
-        }
-    })
-
-    const updatedCustmer = await book.findOne({ _id: id })
-
-    res.status(200).json({
-        success: "true",
-        data: updatedCustmer,
-        message: "Updated successfully..!"
-    })
-
-})
-
-app.patch('/api/bookings/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, age, to, from, adult } = req.body;
-
-    await book.updateOne({ _id: id }, {
-        $set: {
-            name: name,
-            age: age,
-            adult: adult,
-            to: to,
-            from: from
-        }
-    })
-
-    const updatedCustmer = await book.findOne({ _id: id })
-
-    res.status(200).json({
-        success: "true",
-        data: updatedCustmer,
-        message: "Updated successfully..!"
-    })
-
-})
-
-app.delete('/api/bookings/:id', async(req,res)=>{
-    const { id } = req.params
-
-    await book.deleteOne({ _id: id })
-
-    res.status(204).json({
-        success: "true",
-        message: "Data delete succesfully..!"
-    })
-})
-
-app.post('/api/v1/buses', async (req, res) => {
-    const { name, seats,busno,type } = req.body;
-
-    const busbooking = new Bus({
-        name, seats,busno,type 
-    })
-
-    try {
-        const savedBus = await busbooking.save();
-
-        return res.status(201).json({
-            success: true,
-            data: savedBus,
-            message: "bus data add succesfully..!"
-        })
-    } catch (e) {
-        return res.json({
-            success: false,
-            message: e.message
-        })
-    }
-})
-
-app.post('/api/v2/buses', async (req, res) => {
-    const { name, tatalSeats,busno,type } = req.body;
-
-    const busbooking = new Bus({
-        name, tatalSeats,busno,type 
-    })
-
-    try {
-        const savedBus = await busbooking.save();
-
-        return res.status(201).json({
-            success: true,
-            data: savedBus,
-            message: "bus data add succesfully..!"
-        })
-    } catch (e) {
-        return res.json({
-            success: false,
-            message: e.message
-        })
-    }
-})
+app.post('/api/v2/buses', postv2bus)
 
 const PORT = 5000;
 app.listen(PORT, () => {
