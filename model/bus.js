@@ -1,27 +1,23 @@
 import { Schema , model } from "mongoose";
 
-const bookingSchema = new Schema({
-        name:{
+const busSchema = new Schema({
+        busname:{
             type : String,
             required : true
         },
-        age:{
+        tatalSeats:{
             type:Number,
             required : true
         },
-        adult:{
+        type:{
               type:Number,
               default : "0"
         },
-        to:{
-            type : String,
-            required:true
-        },
-        from:{
+        busno:{
             type : String,
             required:true
         }
 })
 
-const book = model ('book' , bookingSchema);
-export default book;
+const Bus = model ('Bus' , busSchema);
+export default Bus;
